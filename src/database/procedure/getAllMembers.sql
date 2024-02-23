@@ -1,0 +1,5 @@
+CREATE OR ALTER PROCEDURE getAllMembers
+AS
+BEGIN
+    SELECT * FROM Members
+END

@@ -1,0 +1,43 @@
+
+### REGISTER USER
+POST http://localhost:3100/register
+Content-Type: application/json
+
+{
+    "cohort_no": "22",
+    "firstName": "Godwin",
+    "lastName": "Maina",
+    "email": "goddy.maina@thejitu.com",
+    "password": "atopwudan"
+}
+
+
+### GET ALL MEMBERS
+GET http://localhost:3100/members
+
+
+
+####GET ONE MEMBER
+GET http://localhost:3100/members/d7600561-c633-4bfa-8c79-fcfcaef76800
+
+
+
+###  UPDATE A MEMBER
+PUT  http://localhost:3100/update/d7600561-c633-4bfa-8c79-fcfcaef76800
+
+Content-Type: application/json
+{
+    "cohort_no": "7566",
+    "firstName": "Alex",
+    "lastName": "MAINA",
+    "email": "adam.maina@thejitu.com",
+    "password": "atopgfdgfwudan"
+}
+
+
+
+###DELETE USER
+
+DELETE http://localhost:3100/delete/6cd0a5c4-fe26-45ea-b149-8582a15eafc6
+
+
