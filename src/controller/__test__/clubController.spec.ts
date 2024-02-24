@@ -173,14 +173,14 @@ describe('Update a member', () => {
     beforeEach(() => {
         req = {
             params: {
-                id: '739f42f7-7174-4e2f-a4d1-edd7bd8449da' // Assuming this ID exists in the database
+                id: '0e200028-2e2b-4ab7-8a72-964cd0938365' 
             },
             body: {
                 cohort_no: '22',
-                firstName: 'UpdatedFirstName',
-                lastName: 'UpdatedLastName',
-                email: 'updated.email@example.com',
-                password: 'updatedPassword'
+                firstName: 'gathogo',
+                lastName: 'maina',
+                email: 'gathogo.maina@theejitu.com',
+                password: 'united123'
             }
         };
         res = {

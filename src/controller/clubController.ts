@@ -135,6 +135,7 @@ export const deleteClubMembers = async (req: Request, res: Response) => {
 export const updateMember = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
         const { cohort_no, firstName, lastName, email, password }: clubInterface = req.body;
         
         // Hashing password
@@ -155,7 +156,6 @@ export const updateMember = async (req: Request, res: Response) => {
 
             console.log(result);
             
-        
         const rowsAffected = result.rowsAffected[0];
 
         if (rowsAffected > 0) {
