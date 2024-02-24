@@ -4,11 +4,11 @@ POST http://localhost:3100/register
 Content-Type: application/json
 
 {
-    "cohort_no": "22",
-    "firstName": "Godwin",
-    "lastName": "Maina",
-    "email": "goddy.maina@thejitu.com",
-    "password": "atopwudan"
+    "cohort_no": "25",
+    "firstName": "MR.LARUSO",
+    "lastName": "MaKNON",
+    "email": "LARUSO.mAKNON@thejitu.com",
+    "password": "atopGUY"
 }
 
 
@@ -18,19 +18,19 @@ GET http://localhost:3100/members
 
 
 ####GET ONE MEMBER
-GET http://localhost:3100/members/d7600561-c633-4bfa-8c79-fcfcaef76800
+GET http://localhost:3100/members/0e200028-2e2b-4ab7-8a72-964cd0938365
 
 
 
 ###  UPDATE A MEMBER
-PUT  http://localhost:3100/update/d7600561-c633-4bfa-8c79-fcfcaef76800
+PUT  http://localhost:3100/update/0e200028-2e2b-4ab7-8a72-964cd0938365
 
 Content-Type: application/json
 {
-    "cohort_no": "7566",
-    "firstName": "Alex",
+    "cohort_no": "766",
+    "firstName": "maxIL0ll",
     "lastName": "MAINA",
-    "email": "adam.maina@thejitu.com",
+    "email": "adamlol.maina@thejitu.com",
     "password": "atopgfdgfwudan"
 }
 
@@ -38,6 +38,6 @@ Content-Type: application/json
 
 ###DELETE USER
 
-DELETE http://localhost:3100/delete/6cd0a5c4-fe26-45ea-b149-8582a15eafc6
+DELETE http://localhost:3100/delete/e01c927e-1f8d-4163-a309-66490d7b96e8
 
 

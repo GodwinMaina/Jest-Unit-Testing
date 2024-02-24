@@ -5,15 +5,8 @@ import { Request, Response } from "express";
 import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 
-// Function to check if email exists
-async function checkIfEmailExists(email: string): Promise<boolean> {
-    const pool = await mssql.connect(sqlConfig);
-    const result = await pool
-        .request()
-        .input('email', mssql.VarChar, email)
-        .query('SELECT COUNT(*) AS count FROM Members WHERE email = @email');
-    return result.recordset[0].count > 0;
-}
+
+
 
 export const registerMember = async (req: Request, res: Response) => {
     try {
@@ -23,16 +16,30 @@ export const registerMember = async (req: Request, res: Response) => {
         // Hashing password
         const hashPwd = await bcrypt.hash(password, 6);
 
-        // Check if password is provided
         if (!password) {
             return res.status(400).json({ error: "Password is required" });
         }
 
+        //check if a user with similar email exist
+        // async function checkIfEmailExists(email: string): Promise<boolean> {
+        //     try {
+        //         const pool = await mssql.connect(sqlConfig);
+        //         const result = await pool.request()
+        //             .input('email', mssql.VarChar, email)
+        //             .query('SELECT COUNT(*) AS count FROM Members WHERE email = @email');
+        
+        //         return result.recordset[0].count > 0;
+        //     } catch (error) {
+        //         console.error('Error checking email existence:', error);
+        //         throw error; 
+        //     }
+        // }
+
         // Check if email exists
-        const emailExists = await checkIfEmailExists(email);
-        if (emailExists) {
-            return res.status(400).json({ error: 'Email is already registered' });
-        }
+        // const emailExists = await checkIfEmailExists(email);
+        // if (emailExists) {
+        //     return res.status(400).json({ error: 'Email is already registered' });
+        // }
 
         // Validating email format
         const emailValidate = /^[a-zA-Z]+[.][a-zA-Z]+@thejitu\.com$/;
@@ -40,7 +47,7 @@ export const registerMember = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid email format. Email must be in the format: fname.lname@thejitu.com' });
         }
 
-        // Creating email from first name and last name
+        //Creating email from first name and lastname
         const memberEmail = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@thejitu.com`;
 
         const pool = await mssql.connect(sqlConfig);
@@ -60,7 +67,6 @@ export const registerMember = async (req: Request, res: Response) => {
             return res.json({ error: "An error occurred while creating Account." });
         }
     } catch (error) {
-        console.error("Error creating user:", error);
         return res.json({ error: "The user account was not created." });
     }
 };
@@ -75,19 +81,23 @@ export const getALLMembers = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "An error occurred while fetching all members." });
     }
 };
-
 export const getOneMember = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
+
         const pool = await mssql.connect(sqlConfig);
-        const result = await pool.request()
+
+        const result = await pool
+            .request()
             .input("member_id", mssql.VarChar, id)
-            .execute('getOneMember');
-        if (result.recordset.length > 0) {
-            return res.json({ user: result.recordset[0] });
-        } else {
+            
+            .query('SELECT * FROM Members WHERE member_id = @member_id'); 
+
+        if (result.recordset.length === 0) {
             return res.status(404).json({ error: "Member not found" });
         }
+
+        return res.json({ user: result.recordset[0] });
     } catch (error) {
         console.error("Error fetching one member:", error);
         return res.status(500).json({ error: "An error occurred while fetching one member." });
@@ -98,17 +108,26 @@ export const deleteClubMembers = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const pool = await mssql.connect(sqlConfig);
-        const result = await pool.request()
-            .input("member_id", mssql.VarChar, id)
-            .execute('deleteMember');
-        if (result.rowsAffected[0] > 0) {
-            return res.json({ message: "Account deleted successfully" });
-        } else {
-            return res.status(404).json({ error: "Member not found" });
+        let result = (await pool.request()
+        .input("member_id", mssql.VarChar, id)
+        .query('DELETE FROM Members WHERE member_id = @member_id')
+        ).rowsAffected
+
+        console.log(result[0]);
+        
+        if(result[0] == 0){
+            return res.status(201).json({
+                error: "User not found"
+            })
+        }else{
+            return res.status(200).json({
+                message: "Account deleted successfully"
+            })
         }
-    } catch (error) {
-        console.error("Error deleting member:", error);
-        return res.status(500).json({ error: "An error occurred while deleting member." });
+    }
+
+    catch (error) {
+        return res.json({error})
     }
 };
 
@@ -118,11 +137,14 @@ export const updateMember = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { cohort_no, firstName, lastName, email, password }: clubInterface = req.body;
         
-        // Hash password if provided
-        const hashPwd = password ? await bcrypt.hash(password, 10) : null; // Use a higher saltRounds for stronger security
-        
+        // Hashing password
+        const hashPwd = await bcrypt.hash(password, 6);
+
+        if (!password) {
+            return res.status(400).json({ error: "Password is required" });
+        }
         const pool = await mssql.connect(sqlConfig);
-        const updated = await pool.request()
+        const result = await pool.request()
             .input("member_id", mssql.VarChar, id)
             .input("cohort_no", mssql.VarChar, cohort_no)
             .input("firstName", mssql.VarChar, firstName)
@@ -131,13 +153,22 @@ export const updateMember = async (req: Request, res: Response) => {
             .input("password", mssql.VarChar, hashPwd)
             .execute('updateUser');
 
-        if (updated.rowsAffected[0] > 0) {
-            return res.json({ message: "User updated successfully" });
+            console.log(result);
+            
+        
+        const rowsAffected = result.rowsAffected[0];
+
+        if (rowsAffected > 0) {
+            return res.status(200).json({
+                message: "User updated successfully"
+            });
         } else {
-            return res.json({ error: "The user was not updated." });
+            return res.status(404).json({
+                error: "User not found or no changes were made"
+            });
         }
     } catch (error) {
         console.error("Error updating user:", error);
-        return res.json({ error: "The user was not updated." });
+        return res.status(500).json({ error: "An error occurred while updating user" });
     }
 };
